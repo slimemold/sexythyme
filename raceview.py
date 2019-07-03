@@ -94,7 +94,7 @@ class JournalTableView(QTableView):
         settings = QSettings()
         settings.beginGroup(group_name)
 
-        self.resize(settings.value('size', defaults.RESULT_TABLE_VIEW_SIZE))
+        self.resize(settings.value('size', defaults.JOURNAL_TABLE_VIEW_SIZE))
 
         if settings.contains('pos'):
             self.move(settings.value('pos'))
