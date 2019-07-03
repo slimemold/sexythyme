@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QMessageBox
 from PyQt5.QtWidgets import QApplication, QMainWindow
 import requests
 import bikereg
+from cheatsheet import CheatSheet
 import common
 import defaults
 import ontheday
@@ -71,6 +72,7 @@ INPUT_TEXT_POINT_SIZE = 32
 #     Preferences
 #     RemoteConfig
 #     Journal
+#     CheatSheet
 
 class AboutDialog(QDialog):
     """About Dialog.
@@ -201,6 +203,7 @@ class MainCentralWidget(QWidget, CentralWidget):
         self.builder = Builder(self.modeldb)
         self.field_table_view = FieldTableView(self.modeldb)
         self.racer_table_view = RacerTableView(self.modeldb)
+        self.cheat_sheet = CheatSheet()
         self.journal_table_view = JournalTableView(self.modeldb)
 
         # Try to keep focus on the result input.
@@ -249,6 +252,9 @@ class MainCentralWidget(QWidget, CentralWidget):
         shortcut = QShortcut(QKeySequence('CTRL+F'), self)
         shortcut.activated.connect(self.handle_field_shortcut)
 
+        shortcut = QShortcut(QKeySequence('CTRL+H'), self)
+        shortcut.activated.connect(self.handle_cheat_sheet_shortcut)
+
         shortcut = QShortcut(QKeySequence('CTRL+J'), self)
         shortcut.activated.connect(self.handle_journal_shortcut)
         shortcut = QShortcut(QKeySequence('CTRL+L'), self)
@@ -262,6 +268,7 @@ class MainCentralWidget(QWidget, CentralWidget):
         self.builder.hide()
         self.field_table_view.hide()
         self.racer_table_view.hide()
+        self.cheat_sheet.hide()
         self.journal_table_view.hide()
 
         racer_in_field_table_view_dict = self.field_table_view.racer_in_field_table_view_dict
@@ -394,6 +401,10 @@ class MainCentralWidget(QWidget, CentralWidget):
         """Handle show field table shortcut."""
         self.button_row.field_button.click()
 
+    def handle_cheat_sheet_shortcut(self):
+        """Handle show cheat sheet table shortcut."""
+        self.cheat_sheet.setVisible(not self.cheat_sheet.isVisible())
+
     def handle_journal_shortcut(self):
         """Handle show journal table shortcut."""
         self.journal_table_view.setVisible(not self.journal_table_view.isVisible())
@@ -463,6 +474,7 @@ class SexyThymeMainWindow(QMainWindow):
         self.close_file_menu_action.setEnabled(False)
         self.race_builder_menu.setEnabled(False)
         self.generate_reports_menu_action.setEnabled(False)
+        self.cheat_sheet_action.setEnabled(False)
         self.journal_action.setEnabled(False)
         self.connect_remote_menu.setEnabled(False)
         self.disconnect_remote_menu.setEnabled(False)
@@ -485,6 +497,7 @@ class SexyThymeMainWindow(QMainWindow):
         self.close_file_menu_action.setEnabled(True)
         self.race_builder_menu.setEnabled(True)
         self.generate_reports_menu_action.setEnabled(True)
+        self.cheat_sheet_action.setEnabled(True)
         self.journal_action.setEnabled(True)
 
         remote_class_string = model.race_table_model.get_race_property(RaceTableModel.REMOTE_CLASS)
@@ -541,6 +554,7 @@ class SexyThymeMainWindow(QMainWindow):
 
         help_menu = self.menuBar().addMenu('&Help')
         help_menu.addAction('About', self.help_about)
+        self.cheat_sheet_action = help_menu.addAction('Show Cheat Sheet', self.help_cheat_sheet)
         self.journal_action = help_menu.addAction('Show Journal', self.help_journal)
 
     def keyPressEvent(self, event): #pylint: disable=invalid-name
@@ -891,6 +905,10 @@ class SexyThymeMainWindow(QMainWindow):
     def help_about(self):
         """Show about dialog."""
         AboutDialog(self).show()
+
+    def help_cheat_sheet(self):
+        """Show cheat sheet."""
+        self.centralWidget().cheat_sheet.show()
 
     def help_journal(self):
         """Show about dialog."""
